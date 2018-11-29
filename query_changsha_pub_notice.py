@@ -31,13 +31,21 @@ if __name__ == "__main__":
 	# name = "保利西海岸"
 	ret_list = []
 	for j in json_:
+		# 公示信息的key转换成中文，易于理解
+		temp_j = {}
 		if name:
 			temp_name = j["xm_title"]
 			if temp_name.find(name) != -1:
-				ret_list.append(j)
+				temp_j["公示主题"] = temp_name
+				temp_j["公示日期"] = j["pubdate"]
+				temp_j["公示网址"] = j["puburl"]
+				ret_list.append(temp_j)
 		else:
+			temp_j["公示主题"] = j["xm_title"]
+			temp_j["公示日期"] = j["pubdate"]
+			temp_j["公示网址"] = j["puburl"]
 			ret_list.append(j)
 	# 按公示日期降序排序，最近的公示放上面
-	ret_list.sort(key=lambda ret: ret["pubdate"], reverse=True)
+	ret_list.sort(key=lambda ret: ret["公示日期"], reverse=True)
 	
 	print(ret_list)
