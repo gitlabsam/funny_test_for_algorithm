@@ -3,7 +3,6 @@
 #12306 自动打开12306网站，并输入用户名、密码和验证码，并登录12306，
 #author bigluo
 #email: 3490699170@qq.com
-#modified by gitlab_sam, blues24@foxmail.com   @ 2018-11-29
 
 #coding=utf-8
 
@@ -80,8 +79,11 @@ def visit_login_page(b):
     time.sleep(4)
     
     # 如果已经登录，则登出
-    if b.find_element_by_id("J-header-logout"):
-	    b.find_element_by_class_name("logout").click()
+    try:
+        if b.find_element_by_id("J-header-logout"):
+            b.find_element_by_class_name("logout").click()
+    except:
+        print("当前无账户已登录")
     return 0
 
 #截取一张验证码图片，保存为aa.png
@@ -169,7 +171,7 @@ def login(b):
           
         username=b.find_element_by_id('J-userName')
         username.clear()
-        user_name = "XXXXX"
+        user_name = "XXXXXX"
         username.send_keys(user_name)
         password=b.find_element_by_id('J-password')
         password.clear()
@@ -189,10 +191,14 @@ def login(b):
         return -1
     
     time.sleep(5)                      #查看验证码是否正确??
-    ret_val=find_button(b,u"error_msgmypasscode1",u"请点击正确的验证码")
-    if ret_val == 0:                 #验证码错误
-        print("login--Verified code error!!!")
-        return 1
+    try:
+	    # 如果有img_temp，且img_src_temp与img_src不一致，则认为失败过，需要重新走登录流程
+	    img_temp = b.find_element_by_id("J-loginImg")
+	    img_src_temp = img_temp.get_attribute("src")
+	    if img_src != img_src_temp:
+	        login(b)
+    except:
+	    print("登录是OK的。")
     
     os.remove(pic_name)
     print("login--successfully!!!")
